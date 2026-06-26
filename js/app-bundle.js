@@ -294,6 +294,10 @@ const Groups = {
             item.onclick = () => {
                 self.selectedGroupId = group.id;
                 self.renderGroupsTree();
+                
+                // Скрываем мобильную панель
+                document.querySelector('.groups-panel').classList.remove('mobile-show');
+                
                 window.dispatchEvent(new CustomEvent('group-selected', { detail: group.id }));
             };
             
@@ -3019,6 +3023,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 showToast('Не удалось скопировать', 'error');
             });
         }
+    };
+
+    // Мобильное переключение групп
+    document.getElementById('btn-toggle-groups').onclick = () => {
+        const panel = document.querySelector('.groups-panel');
+        panel.classList.toggle('mobile-show');
+    };
+
+    document.getElementById('btn-close-groups').onclick = () => {
+        document.querySelector('.groups-panel').classList.remove('mobile-show');
     };
 
     // Инициализация SRS UI

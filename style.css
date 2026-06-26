@@ -414,6 +414,10 @@ button:not(.btn-icon):not(.pill):not(#context-menu button) {
     font-size: 1.125rem;
 }
 
+.btn-mobile-only {
+    display: none;
+}
+
 /* Игровой экран */
 .game-header {
     display: flex;
@@ -1053,34 +1057,127 @@ button:not(.btn-icon):not(.pill):not(#context-menu button) {
 
 /* Адаптивность */
 @media (max-width: 768px) {
+    .btn-mobile-only {
+        display: flex;
+    }
+
     .library-layout {
         flex-direction: column;
+        height: auto;
+        min-height: 100vh;
     }
 
     .groups-panel {
+        position: fixed;
+        top: 0;
+        left: 0;
         width: 100%;
-        max-height: 40vh;
+        height: 100vh;
+        z-index: 1500;
+        transform: translateX(-100%);
+        transition: transform 300ms ease;
+        max-height: none;
+        background: var(--bg-primary);
     }
 
+    .groups-panel.mobile-show {
+        transform: translateX(0);
+    }
+
+    .words-panel {
+        width: 100%;
+    }
+
+    .toolbar {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        padding: 8px;
+    }
+
+    .toolbar button {
+        min-width: 0 !important;
+        padding: 10px 8px;
+        font-size: 13px;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    .toolbar .dropdown {
+        grid-column: span 2;
+    }
+
+    .toolbar .dropdown button {
+        width: 100%;
+    }
+
+    /* Игра: сохраняем 2 колонки на мобилках */
     .game-field {
-        flex-direction: column;
-        padding: 2rem 1rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        padding: 1rem 8px;
+        max-width: 100%;
     }
 
+    .cards-column {
+        gap: 8px;
+    }
+
+    .card {
+        padding: 12px 6px;
+        font-size: 14px;
+        min-height: 50px;
+        border-radius: 8px;
+    }
+
+    .card-key-badge {
+        display: none !important; /* На мобилках не нужны */
+    }
+
+    /* Результаты */
     .results-stats {
         flex-direction: column;
+        gap: 12px;
+        padding: 1rem;
+    }
+
+    .stat-value {
+        font-size: 1.25rem;
+    }
+
+    .results-actions {
+        flex-direction: column;
+    }
+
+    /* Модалки: исправляем обрезание верха */
+    .modal {
+        align-items: flex-start; /* Разрешаем скролл сверху */
+        padding: 1rem;
+    }
+
+    .modal-content {
+        margin: 2rem auto; /* Добавляем отступ сверху */
+        padding: 1.5rem 1rem;
+        max-height: none;
     }
 
     .welcome-actions {
         flex-direction: column;
     }
-
-    .toolbar {
-        flex-direction: column;
+    
+    .game-header {
+        padding: 8px 12px;
+        font-size: 14px;
     }
-
-    .modal-content {
-        margin: 1rem;
+    
+    .game-stats {
+        gap: 8px;
+    }
+    
+    .btn-exit {
+        min-width: 0 !important;
+        padding: 6px 12px;
     }
 }
 
