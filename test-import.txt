@@ -1,0 +1,19 @@
+# Тестовый файл для быстрой вставки
+
+[Приветствия]
+hello = привет
+good morning = доброе утро
+good evening = добрый вечер
+how are you = как дела
+
+[Прощания]
+goodbye = до свидания
+see you = увидимся
+take care = береги себя
+
+[Еда]
+apple = яблоко
+banana = банан
+coffee = кофе
+tea = чай
+water = вода

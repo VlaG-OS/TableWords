@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Matcher — тренажёр для запоминания слов</title>
+    <link rel="stylesheet" href="style.css?v=1.3.0">
+</head>
+
+<body>
+    <!-- Экран 1: Библиотека -->
+    <div id="screen-library" class="screen active">
+        <div class="library-layout">
+            <!-- Левая панель: дерево групп -->
+            <aside class="groups-panel">
+                <div class="groups-header">
+                    <h2>Группы</h2>
+                    <span id="streak-badge" class="streak-badge" title="0 дней подряд"></span>
+                    <button id="btn-new-group" class="btn-icon" title="Новая группа">🗽</button>
+                </div>
+                <div id="groups-tree" class="groups-tree"></div>
+            </aside>
+
+            <!-- Правая панель: слова -->
+            <main class="words-panel">
+                <div class="toolbar">
+                    <button id="btn-add-word" class="btn-primary"><span>+ Добавить слово</span></button>
+
+                    <div class="dropdown" id="dropdown-io">
+                        <button id="btn-io-menu" class="btn-secondary">
+                            <span class="btn-text">⚙ Импорт / Экспорт</span>
+                            <span class="btn-icon-down">▼</span>
+                        </button>
+                        <div class="dropdown-menu" id="io-menu">
+                            <button id="menu-import-txt" class="dropdown-item">
+                                <span>📥 Импорт TXT</span>
+                            </button>
+                            <button id="menu-paste-text" class="dropdown-item">
+                                <span>📋 Вставить текст</span>
+                            </button>
+                            <button id="menu-share-group" class="dropdown-item" style="display: none;">
+                                <span>🔗 Поделиться</span>
+                            </button>
+                            <div class="dropdown-divider"></div>
+                            <button id="menu-export-json" class="dropdown-item">
+                                <span>📤 Экспорт JSON</span>
+                            </button>
+                            <button id="menu-backup" class="dropdown-item">
+                                <span>💾 Бэкап</span>
+                            </button>
+                            <button id="menu-restore" class="dropdown-item">
+                                <span>🔄 Восстановить</span>
+                            </button>
+                            <div class="dropdown-divider"></div>
+                            <button id="menu-export-progress" class="dropdown-item">
+                                <span>📊 Скачать прогресс</span>
+                            </button>
+                            <button id="menu-import-progress" class="dropdown-item">
+                                <span>📈 Загрузить прогресс</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button id="btn-srs-review" class="btn-play" title="Повторить слова из очереди SM-2">📅 Повторить (<span id="srs-due-count">0</span>)</button>
+                    <button id="btn-play" class="btn-play">▶ Играть</button>
+                </div>
+
+                <div id="words-content" class="words-content">
+                    <div class="welcome-block">
+                        <h1>Добро пожаловать в Word Matcher!</h1>
+                        <p>Создайте группу или импортируйте слова из TXT файла</p>
+                        <div class="welcome-actions">
+                            <button class="btn-primary btn-welcome-group">Создать группу</button>
+                            <button class="btn-secondary btn-welcome-import">Импорт TXT</button>
+                        </div>
+                        <details class="example-format">
+                            <summary>Пример формата TXT файла</summary>
+                            <pre>[Группа]
+слово = перевод
+hello = привет</pre>
+                        </details>
+                    </div>
+
+                    <div class="words-view" style="display: none;">
+                        <input type="text" id="search-words" class="search-input" placeholder="🔍 Поиск по словам...">
+
+                        <div class="batch-actions" style="display: none;">
+                            <button id="btn-move-selected" class="btn-secondary">Переместить в...</button>
+                            <button id="btn-copy-selected" class="btn-secondary">Скопировать в...</button>
+                            <button id="btn-delete-selected" class="btn-danger">Удалить выбранные</button>
+                        </div>
+
+                        <table class="words-table">
+                            <thead>
+                                <tr>
+                                    <th class="col-checkbox"><input type="checkbox" id="select-all"></th>
+                                    <th class="col-status">🌐</th>
+                                    <th class="col-front sortable" data-sort="front">Слово ↕</th>
+                                    <th class="col-back sortable" data-sort="back">Перевод ↕</th>
+                                    <th class="col-actions">Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody id="words-table-body"></tbody>
+                        </table>
+
+                        <div class="words-counter"></div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Экран 2: Игра -->
+    <div id="screen-game" class="screen">
+        <div class="game-header">
+            <button id="btn-exit-game" class="btn-exit">✕ Выйти</button>
+            <div class="game-info">
+                <span id="game-group-name">Группа</span>
+            </div>
+            <div class="game-stats">
+                <span id="game-timer">⏱ 00:30</span>
+                <span id="game-progress">✓ 0/6</span>
+                <span id="input-mode-indicator" class="input-mode-indicator"></span>
+            </div>
+        </div>
+
+        <div id="timer-bar" class="timer-bar"></div>
+
+        <div id="phase-indicator" class="phase-indicator" style="display: none;">← выбери слово</div>
+
+        <div class="game-field">
+            <div class="cards-column" id="left-column"></div>
+            <div class="cards-column" id="right-column"></div>
+        </div>
+    </div>
+
+    <!-- Экран 3: Результаты -->
+    <div id="screen-results" class="screen">
+        <div class="results-container">
+            <div class="results-icon" id="results-icon">✓</div>
+            <h1 id="results-title">6 из 6 пар угадано!</h1>
+            <div class="results-stats">
+                <div class="stat">
+                    <span class="stat-label">Время:</span>
+                    <span class="stat-value" id="results-time">25 сек</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Ошибки:</span>
+                    <span class="stat-value" id="results-errors">2</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Очки:</span>
+                    <span class="stat-value" id="results-score">54</span>
+                </div>
+            </div>
+            <div id="srs-results-block" class="srs-results-block" style="display: none;"></div>
+            <div class="results-actions">
+                <button id="btn-play-same-words" class="btn-primary">🔄 Повторить эти слова</button>
+                <button id="btn-play-again" class="btn-primary">▶ Ещё раунд (новые слова)</button>
+                <button id="btn-change-settings" class="btn-secondary">⚙ Изменить настройки</button>
+                <button id="btn-to-library" class="btn-secondary">← В библиотеку</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальные окна -->
+    <div id="modal-overlay" class="modal-overlay"></div>
+
+    <!-- Диалог: Добавить/редактировать слово -->
+    <div id="modal-word" class="modal">
+        <div class="modal-content">
+            <h2 id="modal-word-title">Добавить слово</h2>
+            <input type="text" id="input-front" class="input" placeholder="Слово" autofocus>
+            <input type="text" id="input-back" class="input" placeholder="Перевод">
+            <div class="modal-actions">
+                <button id="btn-word-add-more" class="btn-secondary">Добавить ещё</button>
+                <button id="btn-word-save" class="btn-primary">Сохранить</button>
+                <button class="btn-secondary modal-close">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Диалог: Импорт TXT -->
+    <div id="modal-import" class="modal">
+        <div class="modal-content modal-large">
+            <h2>Импорт из TXT файла</h2>
+            <div id="import-dropzone" class="dropzone">
+                <p>Перетащите файл сюда или</p>
+                <button class="btn-primary">Выбрать файл</button>
+                <input type="file" id="import-file-input" accept=".txt" style="display: none;">
+            </div>
+            <div id="import-preview" style="display: none;">
+                <p id="import-preview-text"></p>
+                <div id="import-group-select" style="display: none;">
+                    <label>Добавить в группу:</label>
+                    <select id="import-target-group" class="input"></select>
+                </div>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="import-skip-duplicates" checked>
+                    Пропускать дубликаты
+                </label>
+            </div>
+            <div class="modal-actions">
+                <button id="btn-do-import" class="btn-primary" style="display: none;">Импортировать</button>
+                <button class="btn-secondary modal-close">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Диалог: Настройки игры -->
+    <div id="modal-game-settings" class="modal">
+        <div class="modal-content modal-large">
+            <h2>Настройки игры</h2>
+
+            <div class="setting-group">
+                <label>Режим отбора слов:</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="word-mode" value="random" checked> Случайные слова</label>
+                    <label><input type="radio" name="word-mode" value="srs"> 📅 Очередь SM-2 (<span id="srs-queue-count">0</span> слов к повтору)</label>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <label>Источник слов:</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="game-source" value="current" checked> <span
+                            id="game-source-current-label">Текущая группа</span></label>
+                    <label><input type="radio" name="game-source" value="recursive"> Текущая группа + все
+                        подгруппы</label>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <label>Количество пар: <span id="pairs-count-value">6</span></label>
+                <input type="range" id="pairs-count" min="2" max="20" value="6" step="1" class="slider">
+                <div class="srs-locked-hint">Определено очередью SM-2</div>
+            </div>
+
+            <div class="setting-group">
+                <label>Лимит времени:</label>
+                <div class="pill-group">
+                    <button class="pill" data-time="5">5с</button>
+                    <button class="pill" data-time="10">10с</button>
+                    <button class="pill" data-time="15">15с</button>
+                    <button class="pill active" data-time="30">30с</button>
+                    <button class="pill" data-time="45">45с</button>
+                    <button class="pill" data-time="60">60с</button>
+                    <button class="pill" data-time="90">90с</button>
+                    <button class="pill" data-time="0">∞</button>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="show-timer" checked>
+                    Показывать таймер
+                </label>
+            </div>
+
+            <div class="setting-group">
+                <label>Управление:</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="input-mode" value="mouse" checked> Мышь</label>
+                    <label><input type="radio" name="input-mode" value="qwer"> QWER / UIOP</label>
+                    <label><input type="radio" name="input-mode" value="numbers"> Цифры 1–8</label>
+                </div>
+            </div>
+
+            <div id="game-warning" class="warning" style="display: none;"></div>
+
+            <div class="modal-actions">
+                <button id="btn-start-game" class="btn-primary btn-large">▶ Начать игру</button>
+                <button class="btn-secondary modal-close">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Диалог: Вставить текст -->
+    <div id="modal-paste-text" class="modal">
+        <div class="modal-content modal-large">
+            <h2>Вставить слова</h2>
+            <textarea id="paste-textarea" class="paste-textarea"
+                placeholder="hello = привет&#10;world = мир&#10;&#10;[Путешествия]&#10;airport = аэропорт&#10;ticket = билет"></textarea>
+            <div id="paste-preview" class="paste-preview"></div>
+            <div id="paste-group-select" style="display: none; margin-top: 1rem;">
+                <label>Добавить в группу:</label>
+                <select id="paste-target-group" class="input"></select>
+            </div>
+            <div class="modal-actions">
+                <button id="btn-do-paste-import" class="btn-primary">Импортировать</button>
+                <button class="btn-secondary modal-close">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Диалог: Поделиться группой -->
+    <div id="modal-share" class="modal">
+        <div class="modal-content modal-large">
+            <h2 id="share-title">Поделиться группой</h2>
+            <label class="checkbox-label" style="margin-bottom: 1rem;">
+                <input type="checkbox" id="share-include-subgroups" checked>
+                Включить подгруппы
+            </label>
+            <div id="share-stats" class="share-stats"></div>
+
+            <!-- Контейнер для одной ссылки или нескольких частей -->
+            <div id="share-links-container"></div>
+
+            <div class="modal-actions">
+                <button class="btn-secondary modal-close">Закрыть</button>
+            </div>
+            <div class="warning" style="margin-top: 1rem; font-size: 0.875rem;">
+                ⚠ Ссылка содержит все слова открыто. Не используй для конфиденциальных данных
+            </div>
+            <div id="share-warning" class="warning" style="display: none; margin-top: 0.5rem;"></div>
+        </div>
+    </div>
+
+    <!-- Диалог: Входящий пакет слов -->
+    <div id="modal-incoming-pack" class="modal">
+        <div class="modal-content">
+            <h2>Входящий пакет слов</h2>
+            <p>Вам прислали список слов:</p>
+            <div id="incoming-pack-info" class="incoming-pack-info"></div>
+            <div id="incoming-pack-preview" class="incoming-pack-preview"></div>
+            <div class="modal-actions">
+                <button id="btn-accept-pack" class="btn-primary">✓ Добавить в библиотеку</button>
+                <button id="btn-reject-pack" class="btn-secondary">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Диалог: Восстановление из бэкапа -->
+    <div id="modal-restore" class="modal">
+        <div class="modal-content">
+            <h2>Восстановить из бэкапа</h2>
+            <div class="warning" style="margin-bottom: 1rem;">
+                ⚠️ <strong>Внимание!</strong> Это полностью заменит все текущие данные.
+            </div>
+            <div id="restore-dropzone" class="dropzone">
+                <p>Перетащите JSON файл бэкапа сюда или</p>
+                <button class="btn-primary">Выбрать файл</button>
+                <input type="file" id="restore-file-input" accept=".json" style="display: none;">
+            </div>
+            <div id="restore-preview" style="display: none; margin-top: 1rem;">
+                <p id="restore-preview-text"></p>
+            </div>
+            <div class="modal-actions">
+                <button id="btn-do-restore" class="btn-danger" style="display: none;">Восстановить данные</button>
+                <button class="btn-secondary modal-close">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Диалог: Контекстное меню группы -->
+    <div id="context-menu" class="context-menu" style="display: none;">
+        <button data-action="rename">Переименовать</button>
+        <button data-action="add-subgroup">Добавить подгруппу</button>
+        <button data-action="share">🔗 Поделиться группой</button>
+        <button data-action="move-words">Переместить слова →</button>
+        <button data-action="merge">Слить с...</button>
+        <button data-action="split">Разделить →</button>
+        <button data-action="delete" class="danger">Удалить</button>
+    </div>
+
+    <!-- Toast уведомления -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <footer class="app-footer">
+        Сделано с ♥ · Владислав Горбатов VLG · <a href="https://t.me/Roscers" target="_blank">@Roscers</a>
+    </footer>
+
+    <script src="js/srs.js?v=1.0.0"></script>
+    <script src="js/app-bundle.js?v=1.3.0"></script>
+</body>
+
+</html>
