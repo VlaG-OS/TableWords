@@ -2769,8 +2769,39 @@ function showToast(message, type = 'success') {
     }, 3000);
 }
 
+// Global error listener for mobile debugging
+window.onerror = function(msg, url, lineNo, columnNo, error) {
+    console.log('[ERROR] ' + msg + ' at ' + lineNo + ':' + columnNo);
+    return false;
+};
+
 // Initialization and event listeners
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('[DEBUG] DOMContentLoaded start');
+    
+    // Мобильное переключение групп (перенесено вверх для надёжности)
+    try {
+        const toggleBtn = document.getElementById('btn-toggle-groups');
+        const closeBtn = document.getElementById('btn-close-groups');
+        const groupsPanel = document.querySelector('.groups-panel');
+
+        console.log('[DEBUG] Mobile init state:', { toggleBtn: !!toggleBtn, groupsPanel: !!groupsPanel });
+
+        if (toggleBtn && groupsPanel) {
+            toggleBtn.onclick = (e) => {
+                console.log('[DEBUG] Toggle clicked');
+                groupsPanel.classList.toggle('mobile-show');
+            };
+        }
+        if (closeBtn && groupsPanel) {
+            closeBtn.onclick = () => {
+                groupsPanel.classList.remove('mobile-show');
+            };
+        }
+    } catch(e) {
+        console.log('[ERROR] Mobile init failed:', e.message);
+    }
+
     Groups.renderGroupsTree();
     Words.renderWordsView();
     Importer.setupImportHandlers();
@@ -3025,16 +3056,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Мобильное переключение групп
-    document.getElementById('btn-toggle-groups').onclick = () => {
-        const panel = document.querySelector('.groups-panel');
-        panel.classList.toggle('mobile-show');
-    };
-
-    document.getElementById('btn-close-groups').onclick = () => {
-        document.querySelector('.groups-panel').classList.remove('mobile-show');
-    };
-
     // Инициализация SRS UI
     Game.updateSRSUI();
+    console.log('[DEBUG] Init complete final');
 });
