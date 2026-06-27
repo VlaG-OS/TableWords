@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /googlecbf95fe3b288127a.html
+Sitemap: https://table-words.vercel.app/sitemap.xml

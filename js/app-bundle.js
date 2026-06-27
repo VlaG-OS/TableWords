@@ -1737,10 +1737,10 @@ const Game = {
                 
                 // Правая колонка: U I O P J K L ; (и русские эквиваленты)
                 const rightKeyToDataKey = {
-                    'u': 'u', 'г': 'u',
-                    'i': 'i', 'ш': 'i',
-                    'o': 'o', 'щ': 'o',
                     'p': 'p', 'з': 'p',
+                    'o': 'o', 'щ': 'o',
+                    'i': 'i', 'ш': 'i',
+                    'u': 'u', 'г': 'u',
                     'j': 'j', 'о': 'j',
                     'k': 'k', 'л': 'k',
                     'l': 'l', 'д': 'l',
@@ -1812,7 +1812,7 @@ const Game = {
         
         if (this.inputMode === 'qwer') {
             leftKeys = ['Q', 'W', 'E', 'R', 'A', 'S', 'D', 'F'];
-            rightKeys = ['U', 'I', 'O', 'P', 'J', 'K', 'L', ';'];
+            rightKeys = ['P', 'O', 'I', 'U', 'J', 'K', 'L', ';'];
         } else if (this.inputMode === 'numbers') {
             leftKeys = ['1', '2', '3', '4', '5', '6', '7', '8'];
             rightKeys = ['1', '2', '3', '4', '5', '6', '7', '8'];
@@ -1952,6 +1952,9 @@ const Game = {
         if (!this.gameState.showTimer) {
             timerBar.style.display = 'none';
             timerText.style.display = 'none';
+        } else {
+            timerBar.style.display = '';
+            timerText.style.display = '';
         }
         
         let elapsed = 0;
@@ -2208,7 +2211,7 @@ const Game = {
         
         document.querySelectorAll('.pill').forEach(pill => {
             pill.classList.remove('active');
-            if (parseInt(pill.dataset.time) === (settings.timeLimit || 30)) {
+            if (parseInt(pill.dataset.time) === (settings.timeLimit || 10)) {
                 pill.classList.add('active');
             }
         });

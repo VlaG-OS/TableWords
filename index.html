@@ -5,6 +5,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Word Matcher — тренажёр для запоминания слов</title>
+    
+    <!-- SEO -->
+    <meta name="description" content="Word Matcher — тренажёр для запоминания слов. Создавай карточки, тренируйся с флэшкартами и системой интервального повторения (SRS).">
+    <link rel="canonical" href="https://table-words.vercel.app/">
+    
+    <!-- Open Graph (для соцсетей и мессенджеров) -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://table-words.vercel.app/">
+    <meta property="og:title" content="Word Matcher — тренажёр для запоминания слов">
+    <meta property="og:description" content="Создавай карточки, тренируйся с флэшкартами и системой интервального повторения (SRS).">
+    <meta property="og:locale" content="ru_RU">
+    
+    <!-- JSON-LD структурированные данные -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Word Matcher",
+        "url": "https://table-words.vercel.app/",
+        "description": "Тренажёр для запоминания слов с системой интервального повторения (SRS) и флэшкартами",
+        "inLanguage": "ru",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Web"
+    }
+    </script>
+    
     <link rel="stylesheet" href="style.css?v=1.3.0">
 </head>
 
@@ -243,12 +269,12 @@ hello = привет</pre>
                 <label>Лимит времени:</label>
                 <div class="pill-group">
                     <button class="pill" data-time="5">5с</button>
-                    <button class="pill" data-time="10">10с</button>
+                    <button class="pill" data-time="6">6с</button>
+                    <button class="pill" data-time="7">7с</button>
+                    <button class="pill" data-time="8">8с</button>
+                    <button class="pill" data-time="9">9с</button>
+                    <button class="pill active" data-time="10">10с</button>
                     <button class="pill" data-time="15">15с</button>
-                    <button class="pill active" data-time="30">30с</button>
-                    <button class="pill" data-time="45">45с</button>
-                    <button class="pill" data-time="60">60с</button>
-                    <button class="pill" data-time="90">90с</button>
                     <button class="pill" data-time="0">∞</button>
                 </div>
             </div>
@@ -264,7 +290,7 @@ hello = привет</pre>
                 <label>Управление:</label>
                 <div class="radio-group">
                     <label><input type="radio" name="input-mode" value="mouse" checked> Мышь</label>
-                    <label><input type="radio" name="input-mode" value="qwer"> QWER / UIOP</label>
+                    <label><input type="radio" name="input-mode" value="qwer"> QWER / POIU</label>
                     <label><input type="radio" name="input-mode" value="numbers"> Цифры 1–8</label>
                 </div>
             </div>
